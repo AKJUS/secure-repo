@@ -93,6 +93,29 @@ func ReplaceActions(inputYaml string, customerMaintainedActions map[string]strin
 			}
 		}
 	}
+
+	// For composite actions
+	if workflow.Runs.Using == "composite" {
+		for stepIdx, step := range workflow.Runs.Steps {
+			if len(step.Uses) > 0 {
+				actionName := strings.Split(step.Uses, "@")[0]
+				if newAction, ok := actionMap[actionName]; ok {
+					latestVersion, err := GetLatestRelease(newAction)
+					if err != nil {
+						return inputYaml, updated, fmt.Errorf("unable to get latest release: %v", err)
+					}
+					replacements = append(replacements, replacement{
+						jobName:        "composite", // special marker for composite actions
+						stepIdx:        stepIdx,
+						newAction:      newAction,
+						originalAction: step.Uses,
+						latestVersion:  latestVersion,
+					})
+				}
+			}
+		}
+	}
+
 	if len(replacements) == 0 {
 		// No changes needed
 		return inputYaml, false, nil
@@ -115,9 +138,19 @@ func ReplaceActions(inputYaml string, customerMaintainedActions map[string]strin
 
 func replaceAction(t *yaml.Node, inputLines []string, replacements []replacement, updated bool) ([]string, bool) {
 	for _, r := range replacements {
-		jobsNode := permissions.IterateNode(t, "jobs", "!!map", 0)
-		jobNode := permissions.IterateNode(jobsNode, r.jobName, "!!map", 0)
-		stepsNode := permissions.IterateNode(jobNode, "steps", "!!seq", 0)
+		var stepsNode *yaml.Node
+
+		if r.jobName == "composite" {
+			// Handle composite actions
+			runsNode := permissions.IterateNode(t, "runs", "!!map", 0)
+			stepsNode = permissions.IterateNode(runsNode, "steps", "!!seq", 0)
+		} else {
+			// Handle regular workflow jobs
+			jobsNode := permissions.IterateNode(t, "jobs", "!!map", 0)
+			jobNode := permissions.IterateNode(jobsNode, r.jobName, "!!map", 0)
+			stepsNode = permissions.IterateNode(jobNode, "steps", "!!seq", 0)
+		}
+
 		if stepsNode == nil {
 			continue
 		}
