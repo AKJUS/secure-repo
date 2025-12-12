@@ -40,12 +40,16 @@ func TestSecureDockerFile(t *testing.T) {
 	httpmock.RegisterResponder("GET", "https://index.docker.io/v2/library/python/manifests/3.7", httpmock.NewStringResponder(200, resp))
 
 	tests := []struct {
-		fileName  string
-		isChanged bool
+		fileName        string
+		isChanged       bool
+		exemptedImages  []string
+		useExemptConfig bool
 	}{
-		{fileName: "Dockerfile-not-pinned", isChanged: true},
-		{fileName: "Dockerfile-not-pinned-as", isChanged: true},
-		{fileName: "Dockerfile-multiple-images", isChanged: true},
+		{fileName: "Dockerfile-not-pinned", isChanged: true, useExemptConfig: false},
+		{fileName: "Dockerfile-not-pinned-as", isChanged: true, useExemptConfig: false},
+		{fileName: "Dockerfile-multiple-images", isChanged: true, useExemptConfig: false},
+		{fileName: "Dockerfile-exempted", isChanged: false, exemptedImages: []string{"python"}, useExemptConfig: true},
+		{fileName: "Dockerfile-exempted-wildcard", isChanged: true, exemptedImages: []string{"amazon*", "alpine"}, useExemptConfig: true},
 	}
 
 	for _, test := range tests {
@@ -55,7 +59,15 @@ func TestSecureDockerFile(t *testing.T) {
 			log.Fatal(err)
 		}
 
-		output, err := SecureDockerFile(string(input))
+		var output *SecureDockerfileResponse
+		if test.useExemptConfig {
+			config := dockerfileConfig{
+				exemptedImages: test.exemptedImages,
+			}
+			output, err = SecureDockerFile(string(input), config)
+		} else {
+			output, err = SecureDockerFile(string(input))
+		}
 		if err != nil {
 			t.Fatalf("Error not expected: %s", err)
 		}

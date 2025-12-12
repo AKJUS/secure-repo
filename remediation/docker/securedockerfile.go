@@ -9,6 +9,7 @@ import (
 	"github.com/google/go-containerregistry/pkg/authn"
 	"github.com/google/go-containerregistry/pkg/name"
 	"github.com/google/go-containerregistry/pkg/v1/remote"
+	"github.com/step-security/secure-repo/remediation/workflow/pin"
 )
 
 var Tr http.RoundTripper = remote.DefaultTransport
@@ -20,7 +21,11 @@ type SecureDockerfileResponse struct {
 	DockerfileFetchError bool
 }
 
-func SecureDockerFile(inputDockerFile string) (*SecureDockerfileResponse, error) {
+type dockerfileConfig struct {
+	exemptedImages []string
+}
+
+func SecureDockerFile(inputDockerFile string, opts ...dockerfileConfig) (*SecureDockerfileResponse, error) {
 	reader := strings.NewReader(inputDockerFile)
 	cmds, err := dockerfile.ParseReader(reader)
 	if err != nil {
@@ -31,6 +36,12 @@ func SecureDockerFile(inputDockerFile string) (*SecureDockerfileResponse, error)
 	response.FinalOutput = inputDockerFile
 	response.OriginalInput = inputDockerFile
 	response.IsChanged = false
+
+	// Get exempted images list, default to empty if no config provided
+	var exemptedImages []string
+	if len(opts) > 0 {
+		exemptedImages = opts[0].exemptedImages
+	}
 
 	for _, c := range cmds {
 		if strings.Contains(c.Cmd, "FROM") && strings.Contains(c.Value[0], ":") {
@@ -64,6 +75,12 @@ func SecureDockerFile(inputDockerFile string) (*SecureDockerfileResponse, error)
 				// is already pinned
 				isPinned = true
 			}
+
+			// Check if image is exempted (skip pinning)
+			if len(exemptedImages) > 0 && pin.ActionExists(image, exemptedImages) {
+				continue
+			}
+
 			if !isPinned {
 				sha, err := getSHA(image, tag)
 				if err != nil {
