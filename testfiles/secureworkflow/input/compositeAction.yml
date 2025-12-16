@@ -1,0 +1,25 @@
+name: 'Test Composite Action'
+description: 'Test composite action for secure workflow'
+branding:
+  icon: 'shield'
+  color: 'blue'
+inputs:
+  token:
+    description: 'GitHub token'
+    required: true
+runs:
+  using: 'composite'
+  steps:
+    - uses: actions/checkout@v1
+
+    - uses: amannn/action-semantic-pull-request@v5
+      with:
+        types: feat,fix,chore
+
+    - uses: fkirc/skip-duplicate-actions@v5
+      with:
+        do_not_skip: '["release"]'
+
+    - name: Run script
+      run: echo "Running script"
+      shell: bash
