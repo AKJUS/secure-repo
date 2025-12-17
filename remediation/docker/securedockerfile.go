@@ -21,11 +21,11 @@ type SecureDockerfileResponse struct {
 	DockerfileFetchError bool
 }
 
-type dockerfileConfig struct {
+type DockerfileConfig struct {
 	exemptedImages []string
 }
 
-func SecureDockerFile(inputDockerFile string, opts ...dockerfileConfig) (*SecureDockerfileResponse, error) {
+func SecureDockerFile(inputDockerFile string, opts ...DockerfileConfig) (*SecureDockerfileResponse, error) {
 	reader := strings.NewReader(inputDockerFile)
 	cmds, err := dockerfile.ParseReader(reader)
 	if err != nil {
