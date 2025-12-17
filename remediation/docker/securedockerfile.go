@@ -22,7 +22,7 @@ type SecureDockerfileResponse struct {
 }
 
 type DockerfileConfig struct {
-	exemptedImages []string
+	ExemptedImages []string
 }
 
 func SecureDockerFile(inputDockerFile string, opts ...DockerfileConfig) (*SecureDockerfileResponse, error) {
@@ -40,7 +40,7 @@ func SecureDockerFile(inputDockerFile string, opts ...DockerfileConfig) (*Secure
 	// Get exempted images list, default to empty if no config provided
 	var exemptedImages []string
 	if len(opts) > 0 {
-		exemptedImages = opts[0].exemptedImages
+		exemptedImages = opts[0].ExemptedImages
 	}
 
 	for _, c := range cmds {

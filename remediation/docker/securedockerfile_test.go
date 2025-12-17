@@ -61,8 +61,8 @@ func TestSecureDockerFile(t *testing.T) {
 
 		var output *SecureDockerfileResponse
 		if test.useExemptConfig {
-			config := dockerfileConfig{
-				exemptedImages: test.exemptedImages,
+			config := DockerfileConfig{
+				ExemptedImages: test.exemptedImages,
 			}
 			output, err = SecureDockerFile(string(input), config)
 		} else {
