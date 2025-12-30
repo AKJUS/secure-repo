@@ -77,6 +77,13 @@ func TestReplaceActions(t *testing.T) {
 			wantUpdated: true,
 			wantErr:     false,
 		},
+		{
+			name:        "composite action with actions to replace",
+			inputFile:   "compositeAction.yml",
+			outputFile:  "compositeAction.yml",
+			wantUpdated: true,
+			wantErr:     false,
+		},
 	}
 
 	for _, tt := range tests {

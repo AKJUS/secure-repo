@@ -1,0 +1,7 @@
+# Test file for exempted images
+# python should NOT be pinned because it's in the exempted list
+FROM python:3.7
+
+RUN apt-get update && apt-get install -y vim
+
+WORKDIR /app

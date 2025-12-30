@@ -225,6 +225,7 @@ func TestSecureWorkflow(t *testing.T) {
 		{fileName: "multiplejobperms.yml", wantPinnedActions: false, wantAddedHardenRunner: false, wantAddedPermissions: true, wantError: false},
 		{fileName: "error.yml", wantPinnedActions: false, wantAddedHardenRunner: false, wantAddedPermissions: false, wantError: false},
 		{fileName: "missingaction.yml", wantPinnedActions: false, wantAddedHardenRunner: false, wantAddedPermissions: false, wantError: true},
+		{fileName: "compositeAction.yml", wantPinnedActions: true, wantAddedHardenRunner: false, wantAddedPermissions: false, wantAddedMaintainedActions: true, wantError: false},
 	}
 	for _, test := range tests {
 		var err error
@@ -256,12 +257,17 @@ func TestSecureWorkflow(t *testing.T) {
 			queryParams["addHardenRunner"] = "true"
 			queryParams["pinActions"] = "true"
 			queryParams["addPermissions"] = "false"
+		case "compositeAction.yml":
+			queryParams["addMaintainedActions"] = "true"
+			queryParams["addHardenRunner"] = "false"
+			queryParams["pinActions"] = "true"
+			queryParams["addPermissions"] = "false"
 		}
 		queryParams["addProjectComment"] = "false"
 
 		var output *permissions.SecureWorkflowReponse
 		var actionMap map[string]string
-		if test.fileName == "oneJob.yml" {
+		if test.fileName == "oneJob.yml" || test.fileName == "compositeAction.yml" {
 			actionMap, err = maintainedactions.LoadMaintainedActions("maintainedactions/maintainedActions.json")
 			if err != nil {
 				t.Errorf("unable to load the file %s", err)

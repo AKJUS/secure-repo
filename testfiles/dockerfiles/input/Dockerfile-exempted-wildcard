@@ -1,0 +1,15 @@
+# Test file for wildcard exemptions
+# amazonlinux should NOT be pinned (matches amazon*)
+# alpine should NOT be pinned (exact match)
+# python SHOULD be pinned (not exempted)
+FROM amazonlinux:2023
+
+RUN yum install -y python3
+
+FROM alpine:3.18
+
+RUN apk add --no-cache bash
+
+FROM python:3.7
+
+RUN pip install requests
