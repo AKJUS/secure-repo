@@ -43,9 +43,9 @@ type Runs struct {
 }
 
 type Container struct {
-	Image   string            `yaml:"image"`
-	Options string            `yaml:"options"`
-	Env     Env               `yaml:"env"`
+	Image   string `yaml:"image"`
+	Options string `yaml:"options"`
+	Env     Env    `yaml:"env"`
 }
 
 type Jobs map[string]Job

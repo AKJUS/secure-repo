@@ -1,0 +1,9 @@
+name: Test Workflow
+on: [push]
+jobs:
+  test:
+    runs-on:
+      - step-ubuntu-24
+      - self-hosted
+    steps:
+      - uses: actions/checkout@v2

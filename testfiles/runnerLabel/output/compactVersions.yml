@@ -1,0 +1,11 @@
+name: Test Workflow
+on: [push]
+jobs:
+  test-22:
+    runs-on: step-ubuntu-22
+    steps:
+      - uses: actions/checkout@v2
+  test-24:
+    runs-on: step-ubuntu-24
+    steps:
+      - uses: actions/checkout@v2

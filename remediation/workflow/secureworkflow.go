@@ -9,6 +9,7 @@ import (
 	"github.com/step-security/secure-repo/remediation/workflow/maintainedactions"
 	"github.com/step-security/secure-repo/remediation/workflow/permissions"
 	"github.com/step-security/secure-repo/remediation/workflow/pin"
+	"github.com/step-security/secure-repo/remediation/workflow/runnerlabel"
 )
 
 const (
@@ -18,13 +19,13 @@ const (
 )
 
 func SecureWorkflow(queryStringParams map[string]string, inputYaml string, svc dynamodbiface.DynamoDBAPI, params ...interface{}) (*permissions.SecureWorkflowReponse, error) {
-	pinActions, addHardenRunner, addPermissions, addProjectComment, replaceMaintainedActions := true, true, true, true, false
-	pinnedActions, addedHardenRunner, addedPermissions, replacedMaintainedActions := false, false, false, false
+	pinActions, addHardenRunner, addPermissions, addProjectComment, replaceMaintainedActions, replaceRunnerLabels := true, true, true, true, false, false
+	pinnedActions, addedHardenRunner, addedPermissions, replacedMaintainedActions, replacedRunnerLabels := false, false, false, false, false
 	ignoreMissingKBs := false
 	enableLogging := false
 	addEmptyTopLevelPermissions := false
 	skipHardenRunnerForContainers := false
-	exemptedActions, pinToImmutable, maintainedActionsMap, actionCommitMap := []string{}, false, map[string]string{}, map[string]string{}
+	exemptedActions, pinToImmutable, maintainedActionsMap, actionCommitMap, runnerLabelMap := []string{}, false, map[string]string{}, map[string]string{}, map[string]string{}
 
 	if len(params) > 0 {
 		if v, ok := params[0].([]string); ok {
@@ -44,6 +45,11 @@ func SecureWorkflow(queryStringParams map[string]string, inputYaml string, svc d
 	if len(params) > 3 {
 		if v, ok := params[3].(map[string]string); ok {
 			actionCommitMap = v
+		}
+	}
+	if len(params) > 4 {
+		if v, ok := params[4].(map[string]string); ok {
+			runnerLabelMap = v
 		}
 	}
 
@@ -69,6 +75,10 @@ func SecureWorkflow(queryStringParams map[string]string, inputYaml string, svc d
 
 	if len(maintainedActionsMap) > 0 {
 		replaceMaintainedActions = true
+	}
+
+	if len(runnerLabelMap) > 0 {
+		replaceRunnerLabels = true
 	}
 
 	if queryStringParams["enableLogging"] == "true" {
@@ -143,6 +153,20 @@ func SecureWorkflow(queryStringParams map[string]string, inputYaml string, svc d
 		}
 	}
 
+	if replaceRunnerLabels {
+		if enableLogging {
+			log.Printf("Replacing runner labels")
+		}
+		secureWorkflowReponse.FinalOutput, replacedRunnerLabels, err = runnerlabel.ReplaceRunnerLabels(secureWorkflowReponse.FinalOutput, runnerLabelMap)
+		if err != nil {
+			log.Printf("Error replacing runner labels: %v", err)
+			secureWorkflowReponse.HasErrors = true
+		}
+		if enableLogging {
+			log.Printf("Replaced runner labels: %v", replacedRunnerLabels)
+		}
+	}
+
 	if pinActions {
 		if enableLogging {
 			log.Printf("Pinning GitHub Actions")
@@ -185,14 +209,16 @@ func SecureWorkflow(queryStringParams map[string]string, inputYaml string, svc d
 	secureWorkflowReponse.AddedHardenRunner = addedHardenRunner
 	secureWorkflowReponse.AddedPermissions = addedPermissions
 	secureWorkflowReponse.AddedMaintainedActions = replacedMaintainedActions
+	secureWorkflowReponse.ReplacedRunnerLabels = replacedRunnerLabels
 	secureWorkflowReponse.UsingSecureRepoPAT = pin.UsingSecureRepoPAT()
 
 	if enableLogging {
-		log.Printf("SecureWorkflow complete - PinnedActions: %v, AddedHardenRunner: %v, AddedPermissions: %v, AddedMaintainedActions: %v, HasErrors: %v, UsingSecureRepoPAT: %v",
+		log.Printf("SecureWorkflow complete - PinnedActions: %v, AddedHardenRunner: %v, AddedPermissions: %v, AddedMaintainedActions: %v, ReplacedRunnerLabels: %v, HasErrors: %v, UsingSecureRepoPAT: %v",
 			secureWorkflowReponse.PinnedActions,
 			secureWorkflowReponse.AddedHardenRunner,
 			secureWorkflowReponse.AddedPermissions,
 			secureWorkflowReponse.AddedMaintainedActions,
+			secureWorkflowReponse.ReplacedRunnerLabels,
 			secureWorkflowReponse.HasErrors,
 			secureWorkflowReponse.UsingSecureRepoPAT)
 	}

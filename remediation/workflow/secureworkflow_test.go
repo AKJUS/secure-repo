@@ -507,3 +507,53 @@ func TestSecureWorkflowEmptyPermissions(t *testing.T) {
 	}
 
 }
+func TestSecureWorkflowRunnerLabels(t *testing.T) {
+	const inputDirectory = "../../testfiles/runnerLabel/input"
+	const outputDirectory = "../../testfiles/runnerLabel/output"
+
+	httpmock.Activate()
+	defer httpmock.DeactivateAndReset()
+
+	var err error
+	var input []byte
+	input, err = ioutil.ReadFile(path.Join(inputDirectory, "secureworkflow.yml"))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	os.Setenv("KBFolder", "../../knowledge-base/actions")
+
+	queryParams := make(map[string]string)
+	queryParams["addHardenRunner"] = "false"
+	queryParams["pinActions"] = "false"
+	queryParams["addPermissions"] = "false"
+	queryParams["addProjectComment"] = "false"
+
+	runnerLabelMap := map[string]string{
+		"ubuntu-latest":  "step-ubuntu-24",
+		"ubuntu-22":      "step-ubuntu-22",
+		"windows-latest": "step-windows",
+	}
+
+	output, err := SecureWorkflow(queryParams, string(input), &mockDynamoDBClient{}, []string{}, false, map[string]string{}, map[string]string{}, runnerLabelMap)
+
+	if err != nil {
+		t.Errorf("Error not expected: %v", err)
+	}
+
+	expectedOutput, err := ioutil.ReadFile(path.Join(outputDirectory, "secureworkflow.yml"))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if output.FinalOutput != string(expectedOutput) {
+		t.Errorf("test failed secureworkflow.yml did not match expected output\nExpected:\n%s\n\nGot:\n%s",
+			string(expectedOutput), output.FinalOutput)
+	}
+
+	if !output.ReplacedRunnerLabels {
+		t.Errorf("Expected ReplacedRunnerLabels to be true, got false")
+	}
+}
