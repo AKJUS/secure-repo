@@ -57,13 +57,13 @@ func TestAddAction(t *testing.T) {
 func TestAddActionWithContainer(t *testing.T) {
 	const inputDirectory = "../../../testfiles/addaction/input"
 	const outputDirectory = "../../../testfiles/addaction/output"
-	
+
 	// Test container job with skipContainerJobs = true
 	input, err := ioutil.ReadFile(path.Join(inputDirectory, "container-job.yml"))
 	if err != nil {
 		t.Fatalf("error reading test file")
 	}
-	
+
 	// Test: Skip container jobs when skipContainerJobs = true
 	got, gotUpdated, err := AddAction(string(input), "step-security/harden-runner@v2", false, false, true)
 	if err != nil {

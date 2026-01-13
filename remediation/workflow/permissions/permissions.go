@@ -21,6 +21,7 @@ type SecureWorkflowReponse struct {
 	PinnedActions          bool
 	AddedHardenRunner      bool
 	AddedPermissions       bool
+	ReplacedRunnerLabels   bool
 	IncorrectYaml          bool
 	WorkflowFetchError     bool
 	JobErrors              []JobError
