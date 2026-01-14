@@ -453,10 +453,10 @@ func TestActionExists(t *testing.T) {
 		t.Errorf("ActionExists returned true for actions/checkout/something")
 	}
 
-	result = ActionExists("step-security/checkout-release/something", []string{"*/checkout-*"})
+	result = ActionExists("amazonlinux:2023", []string{"amazonlinux:*"})
 	t.Log(result)
 	if !result {
-		t.Errorf("ActionExists returned true for actions/checkout/something")
+		t.Errorf("ActionExists returned true for amazonlinux:2023")
 	}
 
 }
