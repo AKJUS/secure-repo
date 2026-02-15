@@ -1,45 +1,40 @@
 module github.com/step-security/secure-repo
 
-go 1.17
+go 1.23.0
 
 require (
 	github.com/asottile/dockerfile v3.1.0+incompatible
 	github.com/aws/aws-lambda-go v1.30.0
 	github.com/aws/aws-sdk-go v1.43.45
 	github.com/paulvollmer/dependabot-config-go v0.1.1
-	github.com/sirupsen/logrus v1.8.1
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
-	gotest.tools v2.2.0+incompatible
+	github.com/sirupsen/logrus v1.9.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
-	github.com/containerd/typeurl v1.0.2 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.0-20210816181553-5444fa50b93d // indirect
-	github.com/docker/cli v20.10.14+incompatible // indirect
-	github.com/docker/distribution v2.8.1+incompatible // indirect
-	github.com/docker/docker v20.10.14+incompatible // indirect
-	github.com/docker/docker-credential-helpers v0.6.4 // indirect
-	github.com/goccy/go-json v0.9.7 // indirect
+	github.com/containerd/typeurl/v2 v2.1.1 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
+	github.com/docker/cli v24.0.4+incompatible // indirect
+	github.com/docker/distribution v2.8.2+incompatible // indirect
+	github.com/docker/docker v28.0.0+incompatible // indirect
+	github.com/docker/docker-credential-helpers v0.7.0 // indirect
+	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang/protobuf v1.5.2 // indirect
-	github.com/google/go-cmp v0.5.7 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
-	github.com/lestrrat-go/blackmagic v1.0.0 // indirect
+	github.com/lestrrat-go/blackmagic v1.0.2 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
-	github.com/lestrrat-go/iter v1.0.1 // indirect
-	github.com/lestrrat-go/option v1.0.0 // indirect
+	github.com/lestrrat-go/iter v1.0.2 // indirect
+	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
-	github.com/moby/buildkit v0.10.3 // indirect
+	github.com/moby/buildkit v0.12.5 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/opencontainers/image-spec v1.0.3-0.20211202183452-c5a74bcca799 // indirect
+	github.com/opencontainers/image-spec v1.1.0-rc3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
-	golang.org/x/net v0.0.0-20220421235706-1d1ef9303861 // indirect
-	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
-	golang.org/x/sys v0.0.0-20220422013727-9388b58f7150 // indirect
-	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
+	golang.org/x/crypto v0.21.0 // indirect
+	golang.org/x/sync v0.1.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
+	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
 
@@ -51,6 +46,6 @@ require (
 	github.com/google/go-github/v40 v40.0.0
 	github.com/jarcoal/httpmock v1.4.0
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/lestrrat-go/jwx v1.2.25
-	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	github.com/lestrrat-go/jwx v1.2.29
+	golang.org/x/oauth2 v0.27.0
 )
